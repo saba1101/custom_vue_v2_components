@@ -4,6 +4,8 @@
       :rateState="2"
       :disabled="false"
       @value="(val) => rate = val"
+      :starFill="'orange'"
+      :starStroke="'orange'"
     />
     <h3> Rating is: {{this.rate}} </h3>
   </div>

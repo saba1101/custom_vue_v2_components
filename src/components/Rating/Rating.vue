@@ -2,10 +2,10 @@
     <div :class="['custom-rating',{'disabled':disabled}]">
         <div class="wrapper">
             <star
-                :width="25"
-                :height="25"
-                :fill="'orange'"
-                :stroke="'orange'"
+                :width="starWidth"
+                :height="starHeight"
+                :fill="starFill"
+                :stroke="starStroke"
                 v-for="(star,ind) in rate"
                 :key="ind"
                 @onSelect="handleSelect(star)"
@@ -27,6 +27,16 @@ export default {
     props:{
         disabled: Boolean,
         rateState: Number,
+        starWidth: {
+            type: Number,
+            default: 25,
+        },
+        starHeight: {
+            type: Number,
+            default: 25,
+        }, 
+        starFill: String,
+        starStroke: String,
     },
     data(){
         return{
