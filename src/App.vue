@@ -1,9 +1,11 @@
 <template>
   <div id="app">
     <rating
-      :rateState="3"
-      :disabled="true"
+      :rateState="2"
+      :disabled="false"
+      @value="(val) => rate = val"
     />
+    <h3> Rating is: {{this.rate}} </h3>
   </div>
 </template>
 
@@ -13,6 +15,11 @@ export default {
   name: 'App',
   components: {
     Rating
+  },
+  data(){
+    return{
+      rate: null
+    }
   }
 }
 </script>

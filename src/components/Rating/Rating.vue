@@ -97,6 +97,7 @@ export default {
                 }
             })
             this.currentRate = currentRate
+            this.$emit('value',currentRate)
         },
         handleEnter(star){
             let val = star.value
