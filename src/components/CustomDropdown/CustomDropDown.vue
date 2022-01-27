@@ -1,5 +1,5 @@
 <template>
-    <div ref="dropdown" :class="['dropdown-wrapper',{'dark': darkTheme}]">
+    <div ref="dropdown" :class="['dropdown-wrapper',{'dark': darkTheme},{'disabled':selecteditem }]">
         <div class="selection-placeholder">
             <input type="text" :placeholder="placeholder" v-model="selectedItemTitle" @input="filteredData($event)" @focus="dropDownVisible = true">
             <div :class="['arrow',{'up':dropDownVisible}]" @click="dropDownVisible = !dropDownVisible">
@@ -7,7 +7,7 @@
                     <path :fill="darkTheme ? '#fff' : '#3d3d3d'" d="M11.611,10.049l-4.76-4.873c-0.303-0.31-0.297-0.804,0.012-1.105c0.309-0.304,0.803-0.293,1.105,0.012l5.306,5.433c0.304,0.31,0.296,0.805-0.012,1.105L7.83,15.928c-0.152,0.148-0.35,0.223-0.547,0.223c-0.203,0-0.406-0.08-0.559-0.236c-0.303-0.309-0.295-0.803,0.012-1.104L11.611,10.049z"></path>
                 </svg>
             </div>
-            <div class="clear" v-if="selectedItemTitle" @click="clear">
+            <div class="clear" v-if="selectedItemTitle && !selecteditem" @click="clear">
                 <svg class="svg-icon" viewBox="0 0 20 20">
                     <path fill="#e56464" d="M15.898,4.045c-0.271-0.272-0.713-0.272-0.986,0l-4.71,4.711L5.493,4.045c-0.272-0.272-0.714-0.272-0.986,0s-0.272,0.714,0,0.986l4.709,4.711l-4.71,4.711c-0.272,0.271-0.272,0.713,0,0.986c0.136,0.136,0.314,0.203,0.492,0.203c0.179,0,0.357-0.067,0.493-0.203l4.711-4.711l4.71,4.711c0.137,0.136,0.314,0.203,0.494,0.203c0.178,0,0.355-0.067,0.492-0.203c0.273-0.273,0.273-0.715,0-0.986l-4.711-4.711l4.711-4.711C16.172,4.759,16.172,4.317,15.898,4.045z"></path>
                 </svg>
@@ -35,10 +35,6 @@
 
 <script>
 export default {
-    created(){
-        this.modifyData(this.data)
-        document.addEventListener("click", this.clickHandler);
-    },
     props:{
         data: Array,
         withIndex: {
@@ -53,7 +49,20 @@ export default {
         withCheckBox: {
             type: Boolean,
             default: false,
+        },
+        selecteditem: {
+            type: Number,
+            default: null,
         }
+    },
+    created(){
+        this.modifyData(this.data)
+        document.addEventListener("click", this.clickHandler);
+        this.setSelectedItem()
+    },
+
+    updated(){
+        this.setSelectedItem()
     },
     data(){
         return{
@@ -96,6 +105,15 @@ export default {
             })
             this.filteredList = data
         },
+        setSelectedItem(){
+            if(this.selecteditem){
+                this.data.forEach(el => {
+                    if(el.value === this.selecteditem) el.selected = true
+                })
+                this.selectedItemTitle = this.data.find(el => el.value === this.selecteditem).title
+                this.selectedItemValue = this.selecteditem
+            }
+        },
         filteredData($event){
             let searchValue = $event.target.value.toLowerCase()
             this.filteredList = this.data.filter(el => el.title.toLowerCase().includes(searchValue))
@@ -131,6 +149,10 @@ export default {
 .dropdown-wrapper{
     width: 18.75rem;
     position: relative;
+
+    &.disabled{
+        pointer-events: none;
+    }
 
     &.dark{
         .selection-placeholder{
