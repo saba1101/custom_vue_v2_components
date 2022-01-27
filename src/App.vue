@@ -17,7 +17,7 @@
         @select="(val) => listItem = val"
         :placeholder="'Select Item List'"
         :darkTheme="false"
-        :withCheckBox="true"
+        :withCheckBox="false"
       />
       <h3>Selected ItemId: {{listItem}}</h3>
     </div>
