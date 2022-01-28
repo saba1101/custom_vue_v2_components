@@ -1,4 +1,4 @@
-# custom_star_rating
+# custom_vue_v2_components
 
 ## Project setup
 ```
