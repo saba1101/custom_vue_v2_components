@@ -1,6 +1,9 @@
 <template>
-    <div ref="dropdown" :class="['dropdown-wrapper',{'dark': darkTheme},{'disabled':selecteditem }]">
+    <div ref="dropdown" :class="['dropdown-wrapper',{'dark': darkTheme,'disabled': selectedItem}]">
         <div class="selection-placeholder">
+            <div v-if="selectedItemsArr.length > 0 && multiSelect" :class="['multi-item-counter',{'more':selectedItemsArr.length >= 100}]">
+                <span> {{selectedItemsArr.length > 100 ? '100' : selectedItemsArr.length}} </span>
+            </div>
             <input type="text" :placeholder="placeholder" v-model="selectedItemTitle" @input="filteredData($event)" @focus="dropDownVisible = true">
             <div :class="['arrow',{'up':dropDownVisible}]" @click="dropDownVisible = !dropDownVisible">
                 <svg class="svg-icon" viewBox="0 0 20 20">
@@ -16,7 +19,11 @@
 
         <div class="dropdown-list-wrapper" v-if="dropDownVisible">
             <ul class="list" v-if="filteredList.length > 0">
-                <li :ref="'listItem'+ind" :class="['list-item',{'selected': item.selected}]" v-for="(item, ind) in filteredList" :key="ind" @click="selectItem(item)">
+                <li class="list-item" v-if="multiSelect" @click="selectAll">
+                    <input class="item-checkbox" type="checkbox" :checked="allSelected">
+                    <span>Select All</span>
+                </li>
+                <li :ref="'listItem'+ind" :class="['list-item',{'selected': item.selected}]" :id="item.value" v-for="(item, ind) in filteredList" :key="ind" @click="selectItem(item)">
                     <input class="item-checkbox" v-if="withCheckBox" type="checkbox" name="check" :checked="item.selected">
                     <span v-if="withIndex" class="ind"> <i># {{ ind }}</i></span>
                     <span>
@@ -53,51 +60,94 @@ export default {
         selecteditem: {
             type: Number,
             default: null,
-        }
-    },
-    created(){
-        this.modifyData(this.data)
-        document.addEventListener("click", this.clickHandler);
-        this.setSelectedItem()
-    },
-
-    updated(){
-        this.setSelectedItem()
+        },
+        multiSelect:{
+            type:Boolean,
+            default: false,
+        },
+        selectedItems: Array,
     },
     data(){
         return{
             dropDownVisible: false,
             selectedItemTitle: '',
             selectedItemValue: null,
-            filteredList: []
+            filteredList: [],
+            selectedItemsArr:[],
+            allSelected: false,
         }
+    },
+    created(){
+        this.modifyData(this.data)
+        document.addEventListener("click", this.clickHandler);
+        this.setSelectedItem()
+        this.setSelectedItems()
+    },
+
+    updated(){
+        this.setSelectedItem()
     },
     watch:{
         selectedItemTitle(val){
             if(!val || val === '' || val.length < 1){
                 this.selectedItemValue = null
-                
-                this.data.forEach(el => {
-                    el.selected = false
-                })
+
+                if(!this.multiSelect){
+                    this.data.forEach(el => {
+                        el.selected = false
+                    })
+
+                }
                 this.filteredList = this.data
 
                 this.$emit('select',this.selectedItemValue)
             }
+        },
+        selectedItemsArr(){
+            let state = this.data.every(el => el.selected)
+            if(state) return
+            else this.allSelected = false
+        },
+        dropDownVisible(){
+            let singleSelectedItem = this.selectedItemValue
+            let firstItem = this.selectedItemsArr[0]
+            if(this.dropDownVisible){
+                this.$nextTick(() => {
+                    let element = document.querySelector('.dropdown-list-wrapper')
+                    let target = document.getElementById(`${!this.multiSelect ? singleSelectedItem : firstItem}`).offsetTop
+                    element.scrollTo({top: target});
+                });
+            }else return
         }
     },
     methods:{
         selectItem(item){
-            this.selectedItemValue = item.value
-            this.selectedItemTitle = item.title
+            if(!this.multiSelect){
+                this.selectedItemValue = item.value
+                this.selectedItemTitle = item.title
+    
+                this.data.forEach(el => {
+                    if(el.value === item.value) el.selected = true
+                    else el.selected = false
+                })
+    
+                this.$emit('select',item.value)
+                this.dropDownVisible = false
+            }else{
+                item.selected = !item.selected
+                if(item.selected){
+                    this.selectedItemsArr.push(item.value)
+                    this.selectedItemsArr = [...new Set(this.selectedItemsArr)]
+                }else{
+                    this.selectedItemsArr = this.selectedItemsArr.filter(el => el !== item.value)
+                }
+                this.$emit('select',this.selectedItemsArr)
 
-            this.data.forEach(el => {
-                if(el.value === item.value) el.selected = true
-                else el.selected = false
-            })
+                if(this.data.every(el => el.selected)){
+                    this.allSelected = true
+                }
 
-            this.$emit('select',item.value)
-            this.dropDownVisible = false
+            }
         },
         modifyData(data){
            data.forEach(el => {
@@ -106,25 +156,37 @@ export default {
             this.filteredList = data
         },
         setSelectedItem(){
-            if(this.selecteditem){
+            if(this.selecteditem && this.selectedItem !== null){
                 this.data.forEach(el => {
                     if(el.value === this.selecteditem) el.selected = true
                 })
                 this.selectedItemTitle = this.data.find(el => el.value === this.selecteditem).title
                 this.selectedItemValue = this.selecteditem
+                this.$emit('selected',this.selectedItemValue)
+            }
+        },
+        setSelectedItems(){
+            if(this.selectedItems.length > 0){
+                this.data.forEach(el => {
+                    if(this.selectedItems.includes(el.value)) el.selected = true
+                })
+                this.selectedItemsArr = [...this.selectedItems]
+                this.$emit('selected',this.selectedItemsArr)
             }
         },
         filteredData($event){
             let searchValue = $event.target.value.toLowerCase()
             this.filteredList = this.data.filter(el => el.title.toLowerCase().includes(searchValue))
-            this.filteredList.forEach(el => {
-                if(el.title.toLowerCase() === searchValue){
-                    el.selected = true
-                    this.selectedItemValue = el.value
-                    this.$emit('select',el.value)
-                }
-                else el.selected = false
-            })
+            if(!this.multiSelect){
+                this.filteredList.forEach(el => {
+                    if(el.title.toLowerCase() === searchValue){
+                        el.selected = true
+                        this.selectedItemValue = el.value
+                        this.$emit('select',el.value)
+                    }
+                    else el.selected = false
+                })
+            }
         },
         clickHandler(event) {
             if(event.path.includes(this.$refs.dropdown)) return
@@ -136,6 +198,20 @@ export default {
             this.data.forEach(el => el.selected = false)
             this.$emit('select',this.selectedItemValue)
             this.dropDownVisible = false
+            if(this.multiSelect) this.selectedItemsArr = []
+        },
+        selectAll(){
+            this.allSelected = !this.allSelected
+            let allItems = []
+            if(this.multiSelect){
+                this.data.forEach(el => {
+                    el.selected = this.allSelected
+                    if(this.allSelected) allItems.push(el.value)
+                    else allItems = []
+                    this.selectedItemsArr = [...new Set(allItems)]
+                    this.$emit('select',this.selectedItemsArr)
+                })
+            }
         }
 
     },
@@ -166,6 +242,14 @@ export default {
                     font-size: 0.9375rem;
                 }
             }
+
+            .multi-item-counter{
+                background: #454545;
+                span{
+                    color: #fff;
+                }
+            }
+
         }
         .dropdown-list-wrapper{
             background: rgba(#454545, 1);
@@ -183,6 +267,10 @@ export default {
                         &::before{
                             background: rgba(#fff,.6);
                         }
+                    }
+
+                    .ind{
+                        color: rgba(#fff,.7);
                     }
                 }
             }
@@ -218,6 +306,43 @@ export default {
             &::placeholder{
                 color: rgba(#3d3d3d, .7);
                 font-size: 0.9375rem;
+            }
+        }
+
+        .multi-item-counter{
+            width: 1.4375rem;
+            height: 1.4375rem;
+            position: absolute;
+            left: -0.4375rem;
+            top: -0.625rem;
+            border-radius: 50%;
+            background: rgba(#454545,.8);
+            display: grid;
+            place-items: center;
+            pointer-events: none;
+            user-select: none;
+            box-shadow: 0rem 0rem 0.625rem rgba(#454545, .3);
+
+            span{
+                color: #fff;
+                font-size: 0.6875rem;
+            }
+
+            &.more{
+                &::after{
+                    content: '+';
+                    position: absolute;
+                    width: 0.9375rem;
+                    height: 0.9375rem;
+                    right: -0.3125rem;
+                    top: -0.375rem;
+                    color: #fff;
+                    background: #e56464;
+                    border-radius: 50%;
+                    display: grid;
+                    place-items: center;
+                    font-size: 0.5625rem;
+                }
             }
         }
 
@@ -340,6 +465,8 @@ export default {
 
                 .item-checkbox{
                     width: 0.9375rem;
+                    margin-left: -0.5625rem;
+                    margin-right: 0.3125rem;
                 }
 
                 @keyframes enter {
