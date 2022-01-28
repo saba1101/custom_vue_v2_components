@@ -65,7 +65,10 @@ export default {
             type:Boolean,
             default: false,
         },
-        selectedItems: Array,
+        selectedItems: {
+            type: Array,
+            default: () => [],
+        },
     },
     data(){
         return{
