@@ -25,7 +25,7 @@
                 </li>
                 <li :ref="'listItem'+ind" :class="['list-item',{'selected': item.selected}]" :id="item.value" v-for="(item, ind) in filteredList" :key="ind" @click="selectItem(item)">
                     <input class="item-checkbox" v-if="withCheckBox" type="checkbox" name="check" :checked="item.selected">
-                    <span v-if="withIndex" class="ind"> <i># {{ ind }}</i></span>
+                    <span v-if="withIndex" class="ind"> <i># {{ item.value }}</i></span>
                     <span>
                         {{ item.title }}
                     </span>
@@ -84,9 +84,6 @@ export default {
         this.setSelectedItems()
     },
 
-    updated(){
-        this.setSelectedItem()
-    },
     watch:{
         selectedItemTitle(val){
             if(!val || val === '' || val.length < 1){
@@ -109,15 +106,7 @@ export default {
             else this.allSelected = false
         },
         dropDownVisible(){
-            let singleSelectedItem = this.selectedItemValue
-            let firstItem = this.selectedItemsArr[0]
-            if(this.dropDownVisible){
-                this.$nextTick(() => {
-                    let element = document.querySelector('.dropdown-list-wrapper')
-                    let target = document.getElementById(`${!this.multiSelect ? singleSelectedItem : firstItem}`).offsetTop
-                    element.scrollTo({top: target});
-                });
-            }else return
+            this.scrollToElement()
         }
     },
     methods:{
@@ -182,6 +171,7 @@ export default {
                     if(el.title.toLowerCase() === searchValue){
                         el.selected = true
                         this.selectedItemValue = el.value
+                        this.scrollToElement()
                         this.$emit('select',el.value)
                     }
                     else el.selected = false
@@ -212,6 +202,17 @@ export default {
                     this.$emit('select',this.selectedItemsArr)
                 })
             }
+        },
+        scrollToElement(){
+            let singleSelectedItem = this.selectedItemValue
+            let firstItem = this.selectedItemsArr[0]
+            if(this.dropDownVisible){
+                this.$nextTick(() => {
+                    let element = document.querySelector('.dropdown-list-wrapper')
+                    let target = document.getElementById(`${!this.multiSelect ? singleSelectedItem : firstItem}`).offsetTop
+                    element.scrollTo({top: target});
+                });
+            }else return
         }
 
     },

@@ -20,7 +20,6 @@
         :withCheckBox="true"
         :multiSelect="true"
         :selecteditem="null"
-        :selectedItems="[2,3,5,6,7,1]"
       />
       <h3>Selected ItemId: {{listItem}}</h3>
     </div>
