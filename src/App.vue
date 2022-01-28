@@ -73,10 +73,13 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
   margin-top: 60px;
+  display: grid;
+  grid-template-columns: auto auto;
+
 
 }
 .main-item-wrapper{
-  border-bottom: 0.0625rem solid rgba(#3d3d3d, .1);
+  border-left: 0.0625rem solid rgba(#3d3d3d, .1);
   padding-bottom: 1rem;
   min-height: 12.5rem;
   display: grid;
