@@ -1,25 +1,25 @@
 <template>
     <div class="custom-grid-wrapper">
-        <table>
-            <thead>
-                <tr>
-                    <th v-if="withIndex">#</th>
-                    <th v-for="(item,ind) in columns" :key="ind">
+        <div class="custom-grid">
+            <div class="head">
+                <div class="row">
+                    <div class="col" v-if="withIndex">#</div>
+                    <div class="col" v-for="(item,ind) in columns" :key="ind">
                         <span> {{item.columnName ? item.columnName : ''}} </span>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="(item,ind) in columns" :key="ind">
-                    <td>
+                    </div>
+                </div>
+            </div>
+            <div class="grid-body">
+                <div class="row" v-for="(item,ind) in columns" :key="ind">
+                    <div class="col">
                         {{ind + 1}}
-                    </td>
-                    <!-- <td v-for="(el,index) in columns" :key="index"> -->
-                        {{setGridObjects(item.key,ind)}}
-                    <!-- </td> -->
-                </tr>
-            </tbody>
-        </table>
+                    </div>
+                    <div class="col" v-for="s in item.columnData" :key="s.index">
+                        {{s}}
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -41,16 +41,19 @@ export default {
         }
     },
     created(){
-
+        this.modifyData()
     },
     computed:{
 
     },
     methods:{
-        setGridObjects(key,ind){
-            if(key === undefined || !key || !ind || ind > this.data.length) return 
-            else return  this.data[ind][key]
-        },
+        modifyData(){
+            this.columns.forEach(col => {
+                let d = this.data.map(el => el[col.key])
+                this.$set(col,'columnData',d)
+                console.log(JSON.parse(JSON.stringify(col)));
+            })
+        }
     },
 
     
@@ -62,40 +65,25 @@ export default {
     width: 100%;
     overflow: auto;
 
-    table{
-        width: 100%;
-        text-align: left;
-        padding: 0 1.25rem;
-        border-collapse: collapse;
-        td,th{
-            padding: 0.625rem 0.625rem;
-            border: 0.0625rem solid rgba(#454545, .4);
-            white-space: nowrap;
-            padding-left: 1.875rem;
-            padding-right: 1.875rem;
-            max-width: 40rem;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        thead{
-
-            tr{
-                position: sticky;
-                top: 0;
-                span{
-                    font-size: 0.9375rem;
-                }
-            }
-        }
-
-        tbody{
-            tr{
-                td{
-
-                }
-            }
-        }
+    .row{
+        height: 5rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: flex;
     }
+
+    .col{
+        display: block;
+        max-width: 20rem;
+
+    }
+
+    .head{
+        width: 100%;
+    
+    }
+
+
 }
 </style>

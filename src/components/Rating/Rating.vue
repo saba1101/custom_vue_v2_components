@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import Star from "@/components/ReusableComponents/Rating/Star.vue"
+import Star from "@/components/Rating/Star.vue"
 export default {
     components: {
         Star

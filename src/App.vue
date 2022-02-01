@@ -28,26 +28,17 @@
         <h3>Selected ItemId: {{listItem}}</h3>
       </div>
     </div>
-    <div class="main-big-comp-wrapper">
-      <custom-grid
-        :data="gridData"
-        :columns="columns"
-        :withIndex="true"
-      />
-    </div>
   </div>
 </template>
 
 <script>
 import Rating from '@/components/Rating/Rating.vue'
 import CustomDropDown from './components/CustomDropdown/CustomDropDown.vue'
-import CustomGrid from '@/components/CustomGrid/CustomGrid.vue'
 export default {
   name: 'App',
   components: {
     Rating,
     CustomDropDown,
-    CustomGrid
   },
   data(){
     return{
