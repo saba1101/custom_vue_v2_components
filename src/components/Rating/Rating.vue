@@ -13,13 +13,14 @@
                 @entered="handleEnter(star)"
                 @left="handleLeave(star)"
                 :inSelection="star.inSelection"
+                :margin="spaceBetween"
             />
         </div>
     </div>    
 </template>
 
 <script>
-import Star from "@/components/Rating/Star.vue"
+import Star from "@/components/ReusableComponents/Rating/Star.vue"
 export default {
     components: {
         Star
@@ -41,6 +42,10 @@ export default {
             type:Number,
             default: 5,
         },
+        spaceBetween:{
+            type: Number,
+            default: 5
+        }
     },
     data(){
         return{
@@ -60,7 +65,11 @@ export default {
     watch:{
         rateState:{
             handler(value){
-                if(value === null || !value) return
+                if(value === null || !value){
+                    value = 0
+                    this.rate.forEach(el => el.selected = false)
+                    return
+                }
                 this.rate.forEach(el => {
                     if(el.value <= value) el.selected = true
                     else{
