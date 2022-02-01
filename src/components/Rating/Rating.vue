@@ -37,43 +37,19 @@ export default {
         }, 
         starFill: String,
         starStroke: String,
+        starsCount: {
+            type:Number,
+            default: 5,
+        },
     },
     data(){
         return{
-            rate:[
-                {
-                    value: 1,
-                    selected: false,
-                    inSelection: false,
-                },
-                {
-                    value: 2,
-                    selected: false,
-                    inSelection: false,
-
-                },
-                {
-                    value: 3,
-                    selected: false,
-                    inSelection: false,
-
-                },
-                {
-                    value: 4,
-                    selected: false,
-                    inSelection: false,
-
-                },
-                {
-                    value: 5,
-                    selected: false,
-                    inSelection: false,
-                },
-            ],
+            rate:[],
             currentRate: null,
         }
     },
     created(){
+        this.rate = this.rateData
         this.rate.forEach(el => {
             if(el.value <= this.rateState) el.selected = true
             else{
@@ -121,6 +97,21 @@ export default {
                 if(el.value <= val) el.inSelection = false
             })
         }
+    },
+    computed:{
+        rateData(){
+            let rate = []
+            for(let i=1; i <= this.starsCount; i++){
+                let obj = {
+                    value: i,
+                    selected: false,
+                    inSelection: false,
+                }
+                rate.push(obj)
+            }
+            return rate
+        }
+
     }
 }
 </script>

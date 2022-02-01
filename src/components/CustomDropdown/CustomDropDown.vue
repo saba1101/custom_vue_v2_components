@@ -1,5 +1,5 @@
 <template>
-    <div ref="dropdown" :class="['dropdown-wrapper',{'dark': darkTheme,'disabled': selectedItem}]">
+    <div ref="dropdown" :class="['dropdown-wrapper',{'dark': darkTheme,'disabled': selecteditem}]">
         <div class="selection-placeholder">
             <div v-if="selectedItemsArr.length > 0 && multiSelect" :class="['multi-item-counter',{'more':selectedItemsArr.length >= 100}]">
                 <span> {{selectedItemsArr.length > 100 ? '100' : selectedItemsArr.length}} </span>
@@ -20,11 +20,15 @@
         <div class="dropdown-list-wrapper" v-if="dropDownVisible">
             <ul class="list" v-if="filteredList.length > 0">
                 <li class="list-item" v-if="multiSelect" @click="selectAll">
-                    <input class="item-checkbox" type="checkbox" :checked="allSelected">
+                    <div :class="['custom-checkbox,','item-checkbox', {'checked': allSelected}]">
+                        <div class="dot"></div>
+                    </div>
                     <span>Select All</span>
                 </li>
                 <li :ref="'listItem'+ind" :class="['list-item',{'selected': item.selected}]" :id="item.value" v-for="(item, ind) in filteredList" :key="ind" @click="selectItem(item)">
-                    <input class="item-checkbox" v-if="withCheckBox" type="checkbox" name="check" :checked="item.selected">
+                    <div :class="['custom-checkbox,','item-checkbox', {'checked': item.selected}]">
+                        <div class="dot"></div>
+                    </div>
                     <span v-if="withIndex" class="ind"> <i># {{ item.value }}</i></span>
                     <span>
                         {{ item.title }}
@@ -148,7 +152,7 @@ export default {
             this.filteredList = data
         },
         setSelectedItem(){
-            if(this.selecteditem && this.selectedItem !== null){
+            if(this.selecteditem && this.selecteditem !== null){
                 this.data.forEach(el => {
                     if(el.value === this.selecteditem) el.selected = true
                 })
@@ -208,7 +212,7 @@ export default {
         },
         scrollToElement(){
             let singleSelectedItem = this.selectedItemValue
-            let firstItem = this.selectedItemsArr[0]
+            let firstItem = this.selectedItemsArr.sort((a,b) => a - b)[0]
             if(this.dropDownVisible){
                 this.$nextTick(() => {
                     let element = document.querySelector('.dropdown-list-wrapper')
@@ -249,6 +253,8 @@ export default {
 
             .multi-item-counter{
                 background: #454545;
+                border: 0.0625rem solid rgba(#fff,.8);
+                box-shadow: 0rem 0rem 0.625rem rgba(#fff,.4);
                 span{
                     color: #fff;
                 }
@@ -276,6 +282,10 @@ export default {
                     .ind{
                         color: rgba(#fff,.7);
                     }
+
+                    .item-checkbox{
+                        border: 0.0625rem solid rgba(#fff, .6);
+                    }
                 }
             }
             .empty{
@@ -291,6 +301,7 @@ export default {
         height: 2.5rem;
         position: relative;
         border: 0.0625rem solid rgba(#ffffff, .2);
+        background: #fff;
         border-radius: 0.3125rem;
         transition: ease .3s;
         box-shadow: 0.0625rem 0.0625rem 1.25rem rgba(#3d3d3d,.2);
@@ -406,7 +417,7 @@ export default {
 
         @keyframes dropdown {
             from{
-                transform: translateY(20%) rotate3d(1, 1, 1, -20deg);
+                transform: translateY(15%) rotate3d(1, 1, 1, -20deg);
                 opacity: 0;
                 border: 0.0625rem solid rgba(#ffffff, .1);
                 
@@ -466,11 +477,33 @@ export default {
                 color: rgba(#3d3d3d, .7);
                 user-select: none;
                 animation: enter .2s forwards ;
+                display: flex;
+                align-items: center;
+                justify-content: left;
 
                 .item-checkbox{
                     width: 0.9375rem;
+                    height: 0.9375rem;
                     margin-left: -0.5625rem;
                     margin-right: 0.3125rem;
+                    border: 0.0625rem solid rgba(#454545, .4);
+                    border-radius: 50%;
+                    position: relative;
+                    overflow: hidden;
+                    transition: ease .3s;
+
+                    .dot{
+                        transition: ease .3s;
+                    }
+                    &.checked{
+                        border: #fff;
+                        .dot{
+                            width: 100%;
+                            height: 100%;
+                            background: rgba(#3d3, 1);
+                            border-radius: 50%;
+                        }
+                    }
                 }
 
                 @keyframes enter {
@@ -483,7 +516,7 @@ export default {
                 }
 
                 &.selected{
-                    opacity: .4;
+                    // opacity: .4;
                     &::before{
                         height: 100%;
                         opacity: 1;
