@@ -34,7 +34,15 @@
           :data="tags"
           @change="(arr) => this.tags = arr"
           @selected="(arr) => this.selectedTags = arr"
+          :withCheckbox="true"
+          :flexGrow="false"
+          :autoHeight="true"
         />
+      </div>
+      <div class="item-flex">
+          <span v-for="(item,ind) in selectedTags" :key="ind">
+              {{item.title}}
+          </span>
       </div>
     </div>
   </div>
@@ -70,7 +78,7 @@ export default {
         let obj={
           title: `item-${j}`,
           id: j,
-          selected: [3,6,8,9].includes(j) ? true : false,
+          selected: true,
         }
         arr.push(obj)
       }
@@ -151,8 +159,22 @@ export default {
     height: 6.25rem;
     overflow: auto;
     margin: 3.125rem auto;
+    position: relative;
 
   }
   
+}
+
+.item-flex{
+  width: 25rem;
+  position: absolute;
+  right: 16.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  span{
+    margin-left: 1.25rem;
+    border-right: 0.0625rem solid rgba(#4f4f4f, .3) ;
+    padding-right: 0.625rem;
+  }
 }
 </style>

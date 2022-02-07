@@ -1,12 +1,18 @@
 <template>
     <div ref="dropdown" class="selectTag-wrapper" @click="dropDownVisible = !dropDownVisible">
-        <div class="selected-box">
+        <div :class="['selected-box',{'overflow':autoHeight}]">
             <div v-if="selectedTags.length <= 0" class="placeholder">
                 <span>
                     Select Tags
                 </span>
             </div>
-            <div :class="['item',{'editing':item.edit}]" v-for="(item,ind) in selectedTags" :key="ind" @click.stop="">
+            <div 
+                :class="['item',{'editing':item.edit}]"
+                v-for="(item,ind) in selectedTags" 
+                :key="ind" @click.stop=""  
+                ref="item"
+                :style="[{flexGrow: flexGrow ? style.flexGrow : ''}]"
+            >
                 <div class="item-title">
                     <span> {{item.title}} </span>
                 </div>
@@ -58,6 +64,11 @@
                 </li>
                 <li :class="{'selected':item.selected || item.edit}" v-for="(item,ind) in tags" :key="ind" @click.stop="selectItem(item)">
                     <div class="title" v-if="!item.edit">
+                        <div :class="['custom-checkbox',{'checked': item.selected}]" v-if="withCheckbox">
+                            <div class="check">
+
+                            </div>
+                        </div>
                         <span> {{item.title}} </span>
                     </div>
                     <div class="editInput" v-else>
@@ -85,6 +96,15 @@
 export default {
     props:{
         data: Array,
+        withCheckbox: {
+            type: Boolean,
+            default: false,
+        },
+        flexGrow: Boolean,
+        autoHeight: {
+            type: Boolean,
+            default: false,
+        }
     },
     data(){
         return{
@@ -94,6 +114,9 @@ export default {
             createMode: false,
             newItemTitle: '',
             searchString: '',
+            style:{
+                flexGrow: 1,
+            }
         }
     },
     watch:{
@@ -161,6 +184,7 @@ export default {
             else{
                 this.selectedTags = this.selectedTags.filter(el => el.id !== item.id)
             }
+            this.emitChanges(true)
         },
         deleteItem(item){
             if(item.newItem){
@@ -197,8 +221,8 @@ export default {
                     this.selectedTags = this.selectedTags.filter(el => el.value !== item.value)
                 }
                 
+                this.emitChanges()
             }
-            console.log(this.tags);
 
         },
         clickHandler(event){
@@ -275,7 +299,7 @@ export default {
         },
         clearSearchResults(){
             this.searchString = ''
-        }
+        },
     },  
     
 }
@@ -320,6 +344,11 @@ export default {
             display: none;
         }
 
+        &.overflow{
+            overflow: unset !important;
+            max-height: unset !important;
+        }
+
         .item{
             padding: 0.1875rem 0.5rem;
             border-radius: 0.3125rem;
@@ -328,11 +357,12 @@ export default {
             margin: 0.3125rem;
             display: flex;
             align-items: center;
-            justify-content: left;
+            justify-content: space-between;
             margin-left: 0.3125rem;
             position: relative;
             overflow: hidden;
             box-shadow: 0rem 0rem 0.625rem rgba(#4d4d4d,.4);
+            position: relative;
 
             &:hover{
                 &::after{
@@ -439,6 +469,24 @@ export default {
                     }
                 }
 
+                .title{
+                    display: grid;
+                    align-items: center;
+                    grid-template-columns: auto auto;
+                }
+
+                .custom-checkbox{
+                    width: 0.9375rem;
+                    height: 0.9375rem;
+                    border-radius: 50%;
+                    border: solid 0.0625rem #3361FF;
+                    position: relative;
+                    margin-right: 1rem;
+                    &.checked{
+                        background: #3361FF;
+                    }
+                }
+
                 &.add-new{
                     position: sticky;
                     top: 0;
@@ -461,6 +509,7 @@ export default {
                             background: transparent;
                             box-sizing: border-box;
                             padding-left: 0.625rem;
+                            padding-right: 4.375rem;
                         }
 
                         .create-actions{

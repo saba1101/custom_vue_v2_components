@@ -217,6 +217,7 @@ export default {
                 this.$nextTick(() => {
                     let element = document.querySelector('.dropdown-list-wrapper')
                     let target = document.getElementById(`${!this.multiSelect ? singleSelectedItem : firstItem}`).offsetTop
+                    console.log(target);
                     element.scrollTo({top: target});
                 });
             }else return
