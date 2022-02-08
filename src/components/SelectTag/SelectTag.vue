@@ -62,7 +62,7 @@
 						</svg>
                     </div>
                 </li>
-                <li :class="{'selected':item.selected || item.edit}" v-for="(item,ind) in tags" :key="ind" @click.stop="selectItem(item)">
+                <li :class="{'selected':item.selected || item.edit,'editMode':item.edit}" v-for="(item,ind) in tags" :key="ind" @click.stop="selectItem(item)">
                     <div class="title" v-if="!item.edit">
                         <div :class="['custom-checkbox',{'checked': item.selected}]" v-if="withCheckbox">
                             <div class="check">
@@ -72,7 +72,7 @@
                         <span> {{item.title}} </span>
                     </div>
                     <div class="editInput" v-else>
-                        <input type="text" v-model="item.title" @click.stop="" @input="editItem($event,item)" @keyup="editInputHandler" ref="editinput">
+                        <textarea type="text" v-model="item.title" @click.stop="" @input="editItem($event,item)" @keyup="editInputHandler" ref="editinput"> </textarea>
                     </div>
                     <div class="actions">
                         <div class="edit-item" @click.stop="editMode(item)">
@@ -605,6 +605,17 @@ export default {
                     height: 100%;
                     margin-left: -0.3125rem;
                     padding-right: 0.3125rem;
+                    textarea{
+                        width: 100%;
+                        height: calc(100% - 0.4375rem);
+                        outline: none;
+                        border: 0.0625rem solid rgba(#3361FF,.2);
+                        font-size: 0.9375rem;
+                        background: transparent;
+                        box-sizing: border-box;
+                        padding: 0.125rem 0.3125rem;
+                        resize: none;
+                    }
                     input{
                         width: 100%;
                         height: 100%;
@@ -617,11 +628,15 @@ export default {
                     }
                 }
 
+                &.editMode{
+                    height: 7rem !important;
+                }
+
                 &.selected{
-                    background: rgba(#4d4d4d,.1);
+                    background: rgba(#3361FF,.1);
 
                     &:hover{
-                        background: rgba(#4d4d4d,.1) !important;
+                        background: rgba(#3361FF,.1) !important;
                     }
 
                     .title > span{
@@ -649,7 +664,7 @@ export default {
                 }
 
                 &:hover:not(.noHover){
-                    background: rgba(#4d4d4d,.5);
+                    background: rgba(#3361FF,.5);
 
                     .title{
                         span{

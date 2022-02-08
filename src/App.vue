@@ -78,7 +78,7 @@ export default {
         let obj={
           title: `item-${j}`,
           id: j,
-          selected: true,
+          selected: false,
         }
         arr.push(obj)
       }
