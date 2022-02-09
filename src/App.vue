@@ -46,23 +46,12 @@
       </div>
     </div>
     <div class="main-item-wrapper">
-      <div class="range">
-        <range-slider
-          class="slider"
-          min="1"
-          max="10"
-          step="1"
-          v-model="sliderValue"
-          >
-          <template slot="knob">
-            <div class="label">
-              <span>
-                {{ sliderValue}}
-              </span>
-            </div>
-          </template>
-        </range-slider>
-      </div>
+      <range-slider 
+        :min="1"
+        :max="20"
+        :steps="1"
+        v-model="sliderValue"
+      />
     </div>
       <div id="chart"> </div>
   </div>
@@ -72,8 +61,8 @@
 import Rating from '@/components/Rating/Rating.vue'
 import CustomDropDown from './components/CustomDropdown/CustomDropDown.vue'
 import SelectTag from '@/components/SelectTag/SelectTag.vue'
-import RangeSlider from 'vue-range-slider'
-import '/styles/rangeSlider.css'
+// import RangeSlider from 'vue-range-slider'
+import RangeSlider from '@/components/RangeSlider/RangeSlider.vue'
 import ApexCharts from 'apexcharts'
 export default {
   name: 'App',
@@ -82,6 +71,7 @@ export default {
     CustomDropDown,
     SelectTag,
     RangeSlider
+    // RangeSlider
   },
   data(){
     return{
@@ -90,7 +80,7 @@ export default {
       tags:[],
       data: [],
       selectedTags:[],
-      sliderValue: 6,
+      sliderValue: 7,
       chartData:{
         chart: {
           type: 'radar',
