@@ -313,6 +313,7 @@ export default {
     border: 0.0625rem solid rgba(#3361FF,.5);
     box-shadow: 0rem 0rem 1.25rem rgba(#4d4d4d,.2);
     border-radius: 0.3125rem;
+    z-index: 99;
 
     .arrow{
         position: absolute;

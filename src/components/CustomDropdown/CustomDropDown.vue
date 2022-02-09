@@ -234,6 +234,7 @@ export default {
 .dropdown-wrapper{
     width: 18.75rem;
     position: relative;
+    z-index: 99;
 
     &.disabled{
         pointer-events: none;

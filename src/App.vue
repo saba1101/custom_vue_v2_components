@@ -45,6 +45,26 @@
           </span>
       </div>
     </div>
+    <div class="main-item-wrapper">
+      <div class="range">
+        <range-slider
+          class="slider"
+          min="1"
+          max="10"
+          step="1"
+          v-model="sliderValue"
+          >
+          <template slot="knob">
+            <div class="label">
+              <span>
+                {{ sliderValue}}
+              </span>
+            </div>
+          </template>
+        </range-slider>
+      </div>
+    </div>
+      <div id="chart"> </div>
   </div>
 </template>
 
@@ -52,12 +72,16 @@
 import Rating from '@/components/Rating/Rating.vue'
 import CustomDropDown from './components/CustomDropdown/CustomDropDown.vue'
 import SelectTag from '@/components/SelectTag/SelectTag.vue'
+import RangeSlider from 'vue-range-slider'
+import '/styles/rangeSlider.css'
+import ApexCharts from 'apexcharts'
 export default {
   name: 'App',
   components: {
     Rating,
     CustomDropDown,
     SelectTag,
+    RangeSlider
   },
   data(){
     return{
@@ -66,10 +90,50 @@ export default {
       tags:[],
       data: [],
       selectedTags:[],
+      sliderValue: 6,
+      chartData:{
+        chart: {
+          type: 'radar',
+          dropShadow:{
+            enabled:true,
+            blur: 1,
+            left: 1,
+            top: 1,
+          },
+          zoom:{
+            enabled:true
+          }
+        },
+        series: [
+          {
+            name: 'series I',
+            data: [4,3,50,49,60,70,91,125,3]
+          },
+          {
+            name: 'series II',
+            data: [5,40,45,50,49,60,70,91,125]
+          },
+          {
+            name: 'series III',
+            data: [-133,40,45,50,49,60,70,91,125]
+          },
+          {
+            name: 'series IV',
+            data: [4,3,50,49,60,70,91,125,3]
+          },
+
+        ],
+        xaxis: {
+          categories: [1990,1992,1993,1994,1995,1996,1997, 1998,1999]
+        }
+      }
     }
   },
   created(){
     this.testarr()
+  },
+  mounted(){
+    this.renderChartData(this.chartData)
   },
   methods:{
     testarr(){
@@ -83,7 +147,11 @@ export default {
         arr.push(obj)
       }
       this.tags = [...arr]
-    }
+    },
+    renderChartData(arr){
+      var chart = new ApexCharts(document.querySelector("#chart"), arr);
+      chart.render();
+    },
   },
   computed:{
     list(){
@@ -123,7 +191,15 @@ export default {
   grid-row-gap: 0.9375rem;
 
 }
+.slider{
+  width: 500px !important;
 
+}
+.render{
+  width: 6.25rem;
+  height: 3.125rem;
+  position: absolute;
+}
 .main-big-comp-wrapper{
   width: 100%;
   border-bottom: 0.0625rem solid rgba(#3d3d3d, .1);

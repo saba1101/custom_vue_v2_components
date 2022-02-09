@@ -1,7 +1,11 @@
 import Vue from 'vue'
 import App from './App.vue'
+import ApexCharts from 'apexcharts'
 
 Vue.config.productionTip = false
+Vue.use({
+  ApexCharts
+})
 
 new Vue({
   render: h => h(App),
