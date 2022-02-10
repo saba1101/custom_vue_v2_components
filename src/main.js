@@ -1,10 +1,13 @@
 import Vue from 'vue'
 import App from './App.vue'
 import ApexCharts from 'apexcharts'
+import axios from 'axios'
+
 
 Vue.config.productionTip = false
 Vue.use({
-  ApexCharts
+  ApexCharts,
+  axios
 })
 
 new Vue({
@@ -21,7 +24,7 @@ Vue.config.errorHandler = function (err, vm, info) {
 Vue.mixin({
   methods:{
     log: function(target,arg){
-      return console.log(`%c${target}`,'color:#fff;padding:0 5px;background:green;border-radius:3px','=>',arg)
+      return console.log(`%c${target}`,`color:#fff;padding:0 5px;background:#fff;border-radius:3px`,'=>',arg)
     }
   }
 })

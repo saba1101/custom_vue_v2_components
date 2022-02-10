@@ -1,17 +1,18 @@
 <template>
     <div ref="dropdown" class="selectTag-wrapper" @click="dropDownVisible = !dropDownVisible">
         <div :class="['selected-box',{'overflow':autoHeight}]">
-            <div v-if="selectedTags.length <= 0" class="placeholder">
+            <div v-if="selectedItems.length <= 0" class="placeholder">
                 <span>
                     Select Tags
                 </span>
             </div>
             <div 
                 :class="['item',{'editing':item.edit}]"
-                v-for="(item,ind) in selectedTags" 
+                v-for="(item,ind) in selectedItems" 
                 :key="ind" @click.stop=""  
                 ref="item"
                 :style="[{flexGrow: flexGrow ? style.flexGrow : ''}]"
+                @click="viewElement(ind)"
             >
                 <div class="item-title">
                     <span> {{item.title}} </span>
@@ -39,7 +40,7 @@
                     <div v-else class="addInput">
                         <input type="text" v-model="newItemTitle" placeholder="Item Name" @keyup="createInputHandler" ref="createInput" @click.stop="">
                         <div class="create-actions">
-                            <div class="create" @click.stop="createNewTag">
+                            <div class="create" @click.stop="createNewItem">
                                 <svg class="svg-icon" viewBox="0 0 20 20">
                                     <path d="M10.219,1.688c-4.471,0-8.094,3.623-8.094,8.094s3.623,8.094,8.094,8.094s8.094-3.623,8.094-8.094S14.689,1.688,10.219,1.688 M10.219,17.022c-3.994,0-7.242-3.247-7.242-7.241c0-3.994,3.248-7.242,7.242-7.242c3.994,0,7.241,3.248,7.241,7.242C17.46,13.775,14.213,17.022,10.219,17.022 M15.099,7.03c-0.167-0.167-0.438-0.167-0.604,0.002L9.062,12.48l-2.269-2.277c-0.166-0.167-0.437-0.167-0.603,0c-0.166,0.166-0.168,0.437-0.002,0.603l2.573,2.578c0.079,0.08,0.188,0.125,0.3,0.125s0.222-0.045,0.303-0.125l5.736-5.751C15.268,7.466,15.265,7.196,15.099,7.03"></path>
                                 </svg>
@@ -62,7 +63,7 @@
 						</svg>
                     </div>
                 </li>
-                <li :class="{'selected':item.selected || item.edit,'editMode':item.edit}" v-for="(item,ind) in tags" :key="ind" @click.stop="selectItem(item)">
+                <li v-show="filteredArr(item.title)" :class="{'selected':item.selected || item.edit,'editMode':item.edit}" v-for="(item,ind) in data" :key="ind" @click.stop="selectItem(item)">
                     <div class="title" v-if="!item.edit">
                         <div :class="['custom-checkbox',{'checked': item.selected}]" v-if="withCheckbox">
                             <div class="check">
@@ -72,7 +73,7 @@
                         <span> {{item.title}} </span>
                     </div>
                     <div class="editInput" v-else>
-                        <textarea type="text" v-model="item.title" @click.stop="" @input="editItem($event,item)" @keyup="editInputHandler" ref="editinput"> </textarea>
+                        <textarea type="text" v-model="item.title" @click.stop="" @keyup="editInputHandler" ref="editinput"> </textarea>
                     </div>
                     <div class="actions">
                         <div class="edit-item" @click.stop="editMode(item)">
@@ -96,6 +97,7 @@
 export default {
     props:{
         data: Array,
+        selectedItems: Array,
         withCheckbox: {
             type: Boolean,
             default: false,
@@ -108,8 +110,6 @@ export default {
     },
     data(){
         return{
-            tags: [],
-            selectedTags:[],
             dropDownVisible: false,
             createMode: false,
             newItemTitle: '',
@@ -123,12 +123,8 @@ export default {
         dropDownVisible:{
             handler(val){
                 if(!val){
-                    this.tags.forEach(el => {
-                        el.edit = false
-                    })
-                    this.selectedTags.forEach(el => {
-                        el.edit = false
-                    })
+                    this.data.forEach(el => el.edit = false)
+                    this.clearSearchResults()
                 }
             }
         },
@@ -138,145 +134,48 @@ export default {
                     this.$nextTick(() => {
                         this.$refs.createInput.focus()
                     })
+                    this.data.forEach(el => el.edit = false)
                 }
-                this.tags.forEach(el => {
-                    el.edit = false
-                })
-                this.selectedTags.forEach(el => {
-                    el.edit = false
-                })
-                this.emitChanges()
             }
         },
-        searchString(val){
-            if(val === '') this.tags = this.data
-            this.tags = this.data.filter(el => el.title.toLowerCase().split(' ').join('').trim().includes(val.toLowerCase().split(' ').join('').trim()))
-        }
     },
     created(){
         document.addEventListener("click", this.clickHandler);
-
-        this.data.forEach(el => {
-            this.$set(el,'edit',false)
-            this.$set(el,'value',el.title)
-            if(el.selected){
-                this.selectedTags.push(el)
-            }
-        })
-        this.tags = [...this.data]
-
+        document.addEventListener('keyup',this.handler)
         this.handler = function(e){
             if(e.key === "Escape" || e.keyCode === 27){
                 this.dropDownVisible = false
             }
         }
-        document.addEventListener('keyup',this.handler)
     },
     beforeDestroy() {
         document.removeEventListener('keyup', this.handler);
     },
     methods:{
         removeItem(item){
-            item.selected = false
-            if(item.newItem){
-                this.selectedTags = this.selectedTags.filter(el => el.value !== item.value)
-            }
-            else{
-                this.selectedTags = this.selectedTags.filter(el => el.id !== item.id)
-            }
-            this.emitChanges(true)
+            this.$emit('removeItem',item)
         },
         deleteItem(item){
-            if(item.newItem){
-                this.tags = this.data.filter(el => el.value !== item.value)
-                this.selectedTags = this.selectedTags.filter(el => el.value !== item.value)
-                this.emitChanges(true)
-            }
-            if(!item.newItem){
-                this.$emit('delete',item)
-            }
+            this.$emit('deleteItem',item)
         },
         selectItem(item){
-            item.selected = !item.selected
-            let exists = this.selectedTags.some(el => el.id === item.id || el.value === item.value)
-
-            if(!item.newItem){
-                
-                if(!exists && item.selected === true){
-                    this.selectedTags.push(item)
-                    this.emitChanges()
-
-                }else{
-                    this.selectedTags = this.selectedTags.filter(el => el.id !== item.id || el.value !== item.value)
-                    this.emitChanges()
-                }
-            }
-
-            if(item.newItem){
-                let exist = this.selectedTags.some(el => el.value === item.value)
-                if(!exist && item.selected){
-                    this.selectedTags.push(item)
-                }
-                if(!item.selected){
-                    this.selectedTags = this.selectedTags.filter(el => el.value !== item.value)
-                }
-                
-                this.emitChanges()
-            }
-
+            this.$emit('select',item)
         },
         clickHandler(event){
             if(event.path.includes(this.$refs.dropdown)) return
             this.dropDownVisible = false
         },
         editMode(item){
-            item.edit = !item.edit
-            this.tags.forEach(el => {
-                if(el.id !== item.id || el.value !== item.value){
-                    el.edit = false
-                }
-            })
-            this.selectedTags.forEach(el => {
-                if(el.id !== item.id){
-                    el.edit = false
-                }
-            })
+            this.$emit('editMode',item)
             this.$nextTick(() => {
                 this.$refs.editinput[0].focus()
             })
         },
-        emitChanges(allData){
-            if(allData){
-                this.$emit('change',this.tags)
-            }
-            this.$emit('selected',this.selectedTags)
-        },
-        editItem($event,item){
-            let val = $event.target.value
-            item.title = val
-            this.selectedTags.find(el => el.value === item.value).title = val
-            this.$emit('change',this.data)
-            this.emitChanges()
-        },
-        createNewTag(){
-            this.tags = this.data //avoids rewritin origin arr
-            this.searchString = ''
-
-            let newObj = {
-                title: this.newItemTitle,
-                newItem: true,
-                selected: true, //new item will be selected
-                edit: false,
-                value: this.newItemTitle,
-            }
+        createNewItem(){
             if(!this.newItemTitle.length || this.newItemTitle === null || this.newItemTitle === undefined || this.newItemTitle == '') return
-            this.tags.unshift(JSON.parse(JSON.stringify(newObj)))
-            this.selectedTags.push(JSON.parse(JSON.stringify(newObj)))
+            this.$emit('createNewItem',this.newItemTitle)
             this.createMode = false
             this.newItemTitle = ''
-
-
-            this.emitChanges(true)
         },
         cancelCreation(){
             this.createMode = false
@@ -284,22 +183,30 @@ export default {
         },
         createInputHandler(e){
             if(e.key === 'Enter' || e.keyCode === 13){
-                this.createNewTag()
+                this.createNewItem()
             }
         },
         editInputHandler(e){
             if(e.key === 'Enter' || e.keyCode === 13){
-                this.selectedTags.forEach(el => {
-                    el.edit = false
-                })
-                this.tags.forEach(el => {
-                    el.edit = false
-                })
+                this.data.forEach(el => el.edit = false)
             }
         },
         clearSearchResults(){
             this.searchString = ''
         },
+        filteredArr(title){
+            if(
+                title.toLowerCase().split(' ').join('').trim().includes(this.searchString.toLowerCase().split(' ').join('').trim())
+            ) return true
+            else return false
+        },
+        viewElement(ind){
+            this.dropDownVisible = true
+            this.$nextTick(() => {
+                console.log(this.$refs.item[ind].getBoundingClientRect().top);
+                document.querySelector('.dropdown').scrollTo({top: this.$refs.item[ind+1].getBoundingClientRect().bottom,behavior:'smooth'})
+            })
+        }
     },  
     
 }
