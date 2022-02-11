@@ -9,10 +9,10 @@
             <div 
                 :class="['item',{'editing':item.edit}]"
                 v-for="(item,ind) in selectedItems" 
-                :key="ind" @click.stop=""  
-                ref="item"
+                :key="ind" 
+                @click.stop=""  
                 :style="[{flexGrow: flexGrow ? style.flexGrow : ''}]"
-                @click="viewElement(ind)"
+                @click="viewElement(item.id)"
             >
                 <div class="item-title">
                     <span> {{item.title}} </span>
@@ -63,7 +63,7 @@
 						</svg>
                     </div>
                 </li>
-                <li v-show="filteredArr(item.title)" :class="{'selected':item.selected || item.edit,'editMode':item.edit}" v-for="(item,ind) in data" :key="ind" @click.stop="selectItem(item)">
+                <li v-show="filteredArr(item.title)" :id="`target${item.id}`" :class="[{'selected':item.selected || item.edit,'editMode':item.edit}]" v-for="(item,ind) in data" :key="ind" @click.stop="selectItem(item)">
                     <div class="title" v-if="!item.edit">
                         <div :class="['custom-checkbox',{'checked': item.selected}]" v-if="withCheckbox">
                             <div class="check">
@@ -200,15 +200,13 @@ export default {
             ) return true
             else return false
         },
-        viewElement(ind){
+        viewElement(id){
             this.dropDownVisible = true
             this.$nextTick(() => {
-                console.log(this.$refs.item[ind].getBoundingClientRect().top);
-                document.querySelector('.dropdown').scrollTo({top: this.$refs.item[ind+1].getBoundingClientRect().bottom,behavior:'smooth'})
+                document.querySelector('.dropdown').scrollTo({top: document.querySelector(`#target${id}`).offsetTop - 100,behavior:'smooth'})
             })
         }
     },  
-    
 }
 </script>
 
