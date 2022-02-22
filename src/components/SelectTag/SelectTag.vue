@@ -12,7 +12,7 @@
                 :key="ind" 
                 @click.stop=""  
                 :style="[{flexGrow: flexGrow ? style.flexGrow : ''}]"
-                @click="viewElement(item.id)"
+                @click="viewElement(item.id,item.value,item.newItem)"
             >
                 <div class="item-title">
                     <span> {{item.title}} </span>
@@ -63,7 +63,7 @@
 						</svg>
                     </div>
                 </li>
-                <li v-show="filteredArr(item.title)" :id="`target${item.id}`" :class="[{'selected':item.selected || item.edit,'editMode':item.edit}]" v-for="(item,ind) in data" :key="ind" @click.stop="selectItem(item)">
+                <li v-show="filteredArr(item.title)" :id="!item.newItem ? `target${item.id}`: `target${item.value.split(' ').join('').toLowerCase().trim()}`" :class="[{'selected':item.selected || item.edit,'editMode':item.edit}]" v-for="(item,ind) in data" :key="ind" @click.stop="selectItem(item)">
                     <div class="title" v-if="!item.edit">
                         <div :class="['custom-checkbox',{'checked': item.selected}]" v-if="withCheckbox">
                             <div class="check">
@@ -200,10 +200,16 @@ export default {
             ) return true
             else return false
         },
-        viewElement(id){
+        viewElement(id,value,newItem){
             this.dropDownVisible = true
+            console.log(value);
+            console.log(value.split(' ').join('').toLowerCase().trim());
             this.$nextTick(() => {
-                document.querySelector('.dropdown').scrollTo({top: document.querySelector(`#target${id}`).offsetTop - 100,behavior:'smooth'})
+                if(!newItem){
+                    document.querySelector('.dropdown').scrollTo({top: document.querySelector(`#target${id}`).offsetTop - 100,behavior:'smooth'})
+                }else{
+                    document.querySelector('.dropdown').scrollTo({top: document.querySelector(`#target${value.split(' ').join('').toLowerCase().trim()}`).offsetTop - 100,behavior:'smooth'})
+                }
             })
         }
     },  

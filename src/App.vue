@@ -51,13 +51,26 @@
     </div>
     <div class="main-item-wrapper">
       <range-slider 
-        :min="1"
-        :max="20"
+        :min="6"
+        :max="8"
         :steps="1"
         v-model="sliderValue"
       />
     </div>
-      <div id="chart"> </div>
+      <div id="chart" v-show="false"> </div>
+
+      <div class="main-item-wrapper drag">
+        <draggable 
+          v-model="tags"
+          @change="dragChange"
+        >
+            <transition-group>
+                <div class="draggable-item" v-for="(el,ind) in tags" :key="ind">
+                    {{el.title}}
+                </div>
+            </transition-group>
+        </draggable>
+      </div>
   </div>
 </template>
 
@@ -65,6 +78,7 @@
 import Rating from '@/components/Rating/Rating.vue'
 import CustomDropDown from './components/CustomDropdown/CustomDropDown.vue'
 import SelectTag from '@/components/SelectTag/SelectTag.vue'
+import draggable from 'vuedraggable'
 // import RangeSlider from 'vue-range-slider'
 import RangeSlider from '@/components/RangeSlider/RangeSlider.vue'
 import ApexCharts from 'apexcharts'
@@ -75,7 +89,8 @@ export default {
     Rating,
     CustomDropDown,
     SelectTag,
-    RangeSlider
+    RangeSlider,
+    draggable
     // RangeSlider
   },
   data(){
@@ -248,6 +263,10 @@ export default {
       })
     },
 
+    dragChange($event){
+      console.log($event.moved); //obtain new and old indexes
+      // let movedItem = $event.moved.element.id
+    },
 
 
 
@@ -277,7 +296,7 @@ export default {
       let newObj = {
         title: title,
         newItem: true,
-        selected: true, //new item will be selected
+        selected: true, //new items will be selected
         edit: false,
         value: title,
       }
@@ -378,6 +397,13 @@ export default {
   min-height: 12.5rem;
   display: grid;
   place-items: center;
+
+  &.drag{
+    .draggable-item{
+      padding: 0.3125rem 0.625rem;
+      border: 0.0625rem solid rgba(#4f4f4f, .3);
+    }
+  }
 
   &.tags{
     .wrap{
