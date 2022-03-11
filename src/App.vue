@@ -106,6 +106,7 @@
               :lineHeight="slider.lineHeight"
               @dragStart="slidebarDrag"
               :showTooltip="true"
+              :isDisabled="false"
               >
             </slide-bar>
       </div>

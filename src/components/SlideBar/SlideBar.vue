@@ -2,7 +2,7 @@
   <div
     ref="wrap"
     :id="id"
-    class="vue-slide-bar-component vue-slide-bar-horizontal"
+    :class="['vue-slide-bar-component', 'vue-slide-bar-horizontal',{'disabled':isDisabled}]"
     :style="calculateHeight"
     @click="wrapClick">
     <div
@@ -25,7 +25,7 @@
             class="vue-slide-bar-tooltip-top vue-slide-bar-tooltip-wrap"
           >
             <slot name="tooltip">
-              <img src="@/assets/star.png" alt="">
+              <img src="@/assets/star.svg" alt="">
             </slot>
           </span>
         </div>
@@ -120,7 +120,7 @@ export default {
     },
     isDisabled: {
       type: Boolean,
-      default: false
+      default: true
     },
     draggable: {
       type: Boolean,
@@ -406,6 +406,12 @@ export default {
 	position: relative;
 	box-sizing: border-box;
 	user-select: none;
+
+  &.disabled{
+    pointer-events: none !important;
+    opacity: .7;
+  }
+
 }
 .vue-slide-bar {
 	position: relative;
