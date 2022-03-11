@@ -15,13 +15,13 @@
     </div>
     <div class="main-item-wrapper">
       <custom-drop-down
-        :data="list"
+        :data="testList"
         :withIndex="true"
         @select="(val) => listItem = val"
         :placeholder="'Select Item List'"
         :darkTheme="false"
         :withCheckBox="true"
-        :multiSelect="true"
+        :multiSelect="false"
         :selecteditem="null"
       />
       <div class="wrap testfield">
@@ -63,13 +63,50 @@
         <draggable 
           v-model="tags"
           @change="dragChange"
+          ghost-class="ghost"
+          :sort="true"
         >
-            <transition-group>
-                <div class="draggable-item" v-for="(el,ind) in tags" :key="ind">
+            <transition-group tag="ul">
+                <li class="draggable-item" v-for="(el,ind) in tags" :key="ind">
                     {{el.title}}
-                </div>
+                </li>
             </transition-group>
         </draggable>
+            <button slot="header" @click="setIndex">ind</button>
+
+      </div>
+      <div class="main-item-wrapper">
+              <star-rating
+                v-model="ratingValue"
+                :starSize="30"
+                :round-start-rating="false"
+                :star-points="[23,2, 14,17, 0,19, 10,34, 7,50, 23,43, 38,50, 36,34, 46,19, 31,17]"
+                :border-width="0"
+                :active-color="['orange','orange']"
+                :active-border-color="['#F6546A','#a8c3c0']"
+                :clearable="true"
+                active-on-click
+                animate
+                :padding="5"
+                :increment='0.5'
+                :max-rating="10"
+                :readOnly="false"
+              >
+              </star-rating>
+      </div>
+      <div class="main-item-wrapper">
+
+            <slide-bar
+              v-model="slidebarValue"
+              :min="1"
+              :max="10"
+              :data="slider.data"
+              :range="slider.range"
+              :processStyle="slider.processStyle"
+              :lineHeight="slider.lineHeight"
+              :tooltipStyles="{ backgroundColor: 'lime', borderColor: 'lime' }"
+              >
+            </slide-bar>
       </div>
   </div>
 </template>
@@ -83,6 +120,8 @@ import draggable from 'vuedraggable'
 import RangeSlider from '@/components/RangeSlider/RangeSlider.vue'
 import ApexCharts from 'apexcharts'
 import axios from 'axios'
+import StarRating from '@/components/StarRating/star-rating.vue'
+import SlideBar from '@/components/SlideBar/index.vue'
 export default {
   name: 'App',
   components: {
@@ -90,13 +129,17 @@ export default {
     CustomDropDown,
     SelectTag,
     RangeSlider,
-    draggable
+    draggable,
+    StarRating,
+    SlideBar,
     // RangeSlider
   },
   data(){
     return{
       rate: null,
       listItem: null,
+      ratingValue: 5.5,
+      slidebarValue: 2,
       tags:[],
       selectedTags:[],
       data: [],
@@ -222,7 +265,44 @@ export default {
         "titleTranslated": "Multitasking",
         "selected": false
       }
-    ]
+    ],
+      testList: [],
+      slider: {
+        value: 45,
+        data: [
+          2,2.5,3,3.5,4,4.5,5,7,10
+        ],
+        range: [
+          {
+            label: '2'
+          },
+          {
+            label: '2.5',
+            isHide: true
+          },
+          {
+            label: '3',
+          },
+          {
+            label: '3.5',
+            isHide: true
+          },
+          {
+            label: '5'
+          },
+          {
+            label: '7',
+            isHide: true
+          },
+          {
+            label: '10'
+          },
+        ],
+        lineHeight: 10,
+        processStyle: {
+          backgroundColor: 'red'
+        }
+      }
     }
   },
   created(){
@@ -233,6 +313,11 @@ export default {
     this.renderChartData(this.chartData)
   },
   methods:{
+    setIndex(){
+      this.tags.forEach((el,ind) => {
+        this.$set(el,'order',ind)
+      })
+    },
     // testarr(){
     //   let arr = []
     //   for (let j=0; j <= 15; j++){
@@ -259,6 +344,11 @@ export default {
           selected: false,
           edit:false,
           value: el.Description
+        }))
+
+        this.testList = resp.data.OpenPositionItems.map(el => ({
+          title: el.Description,
+          value: el.ID
         }))
       })
     },
@@ -377,6 +467,7 @@ export default {
   grid-row-gap: 0.9375rem;
 
 }
+
 .slider{
   width: 500px !important;
 
@@ -399,6 +490,9 @@ export default {
   place-items: center;
 
   &.drag{
+    ul{
+      list-style: none;
+    }
     .draggable-item{
       padding: 0.3125rem 0.625rem;
       border: 0.0625rem solid rgba(#4f4f4f, .3);
