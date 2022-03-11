@@ -98,13 +98,14 @@
 
             <slide-bar
               v-model="slidebarValue"
-              :min="1"
-              :max="10"
+              :min="5"
+              :max="7"
               :data="slider.data"
               :range="slider.range"
               :processStyle="slider.processStyle"
               :lineHeight="slider.lineHeight"
-              :tooltipStyles="{ backgroundColor: 'lime', borderColor: 'lime' }"
+              @dragStart="slidebarDrag"
+              :showTooltip="true"
               >
             </slide-bar>
       </div>
@@ -121,7 +122,7 @@ import RangeSlider from '@/components/RangeSlider/RangeSlider.vue'
 import ApexCharts from 'apexcharts'
 import axios from 'axios'
 import StarRating from '@/components/StarRating/star-rating.vue'
-import SlideBar from '@/components/SlideBar/index.vue'
+import SlideBar from '@/components/SlideBar/SlideBar.vue'
 export default {
   name: 'App',
   components: {
@@ -139,7 +140,7 @@ export default {
       rate: null,
       listItem: null,
       ratingValue: 5.5,
-      slidebarValue: 2,
+      slidebarValue: 6.5,
       tags:[],
       selectedTags:[],
       data: [],
@@ -268,39 +269,42 @@ export default {
     ],
       testList: [],
       slider: {
-        value: 45,
+        value: 5,
         data: [
-          2,2.5,3,3.5,4,4.5,5,7,10
+          5,
+          5.5,
+          6,
+          6.5,
+          7,
         ],
         range: [
           {
-            label: '2'
+            label: '5',
+            type: 'int',
           },
           {
-            label: '2.5',
-            isHide: true
+            label: '5.5',
+            isHide: true,
+            type: 'float',
           },
           {
-            label: '3',
+            label: '6',
+            type: 'int',
           },
           {
-            label: '3.5',
-            isHide: true
-          },
-          {
-            label: '5'
+            label: '6.5',
+            isHide: true,
+            type: 'float',
+
           },
           {
             label: '7',
-            isHide: true
-          },
-          {
-            label: '10'
+            type: 'int',
           },
         ],
-        lineHeight: 10,
+        lineHeight: 6,
         processStyle: {
-          backgroundColor: 'red'
+
         }
       }
     }
@@ -313,6 +317,24 @@ export default {
     this.renderChartData(this.chartData)
   },
   methods:{
+    slidebarDrag(){
+      // this.slider.range.forEach(el => {
+      //   if(el.type === 'int'){
+      //     if(parseInt(el.label) <= this.slidebarValue){
+      //       el['active'] = true
+      //     }else{
+      //       el['active'] = false
+      //     }
+      //   }
+      //   if(el.type === 'float'){
+      //     if(parseFloat(el.label) <= this.slidebarValue){
+      //       el['active'] = true
+      //     }else{
+      //       el['active'] = false
+      //     }
+      //   }
+      // })
+    },
     setIndex(){
       this.tags.forEach((el,ind) => {
         this.$set(el,'order',ind)

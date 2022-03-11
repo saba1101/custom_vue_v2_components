@@ -25,12 +25,7 @@
             class="vue-slide-bar-tooltip-top vue-slide-bar-tooltip-wrap"
           >
             <slot name="tooltip">
-              <span
-                :style="tooltipStyles"
-                class="vue-slide-bar-tooltip"
-              >
-                {{ val }}
-              </span>
+              <img src="@/assets/star.png" alt="">
             </slot>
           </span>
         </div>
@@ -48,7 +43,7 @@
       <div
         v-for="(r, index) in range"
         :key="index"
-        class="vue-slide-bar-separate"
+        :class="['vue-slide-bar-separate',{'progress': r.type === 'int' ? parseInt(r.label) <= val : parseFloat(r.label) <= val}]"
         :style="dataLabelStyles"
       >
         <span
@@ -63,7 +58,7 @@
 </template>
 <script>
 export default {
-  name: 'vue-slide-bar',
+  name: 'slide-bar',
   data () {
     return {
       flag: false,
@@ -77,7 +72,7 @@ export default {
       dataLabelStyles: {
         'color': '#4a4a4a',
         'font-family': 'Arial, sans-serif',
-        'font-size': '12px',
+        'font-size': '0.75rem',
         ...this.$props.labelStyles
       }
     }
@@ -198,7 +193,7 @@ export default {
       return [this.minimum, this.maximum]
     },
     calculateHeight () {
-      return this.paddingless ? {} : { 'padding-top': '40px', 'min-height': this.range ? '100px' : null }
+      return this.paddingless ? {} : { 'padding-top': '2.5rem', 'min-height': this.range ? '6.25rem' : null }
     }
   },
   watch: {
@@ -249,8 +244,7 @@ export default {
       let pos = this.getPos(e)
       this.setValueOnPos(pos)
     },
-    moveStart (e, index) {
-      console.log(e,index);
+    moveStart () {
       if (!this.draggable) return false
       this.flag = true
       this.$emit('dragStart', this)
@@ -261,8 +255,7 @@ export default {
       if (e.targetTouches && e.targetTouches[0]) e = e.targetTouches[0]
       this.setValueOnPos(this.getPos(e), true)
     },
-    moveEnd (e) {
-      console.log(e);
+    moveEnd () {
       if (this.flag && this.draggable) {
         this.$emit('dragEnd', this)
         if (this.lazy && this.isDiff(this.val, this.value)) {
@@ -406,107 +399,131 @@ export default {
 }
 </script>
 
-<style scoped>
-
-.vue-slide-bar-component{
-  width: 30rem !important;
-}
+<style lang="scss" scoped>
 
 .vue-slide-bar-component {
-  position: relative;
-  box-sizing: border-box;
-  user-select: none;
+	width: 150px !important;
+	position: relative;
+	box-sizing: border-box;
+	user-select: none;
 }
 .vue-slide-bar {
-  position: relative;
-  display: block;
-  border-radius: 15px;
-  background-color: #d8d8d8;
-  cursor: pointer;
-}
-.vue-slide-bar::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 2;
+	position: relative;
+	display: block;
+	border-radius: 0.9375rem;
+	background-color: #ADB8CC;
+	cursor: pointer;
+  z-index: 8;
+	&::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 2;
+	}
 }
 .vue-slide-bar-process {
-  position: absolute;
-  border-radius: 15px;
-  background-color: #1066FD;
-  transition: all 0s;
-  z-index: 1;
-  width: 0;
-  height: 100%;
-  top: 0;
-  left: 0;
-  will-change: width;
+	position: absolute;
+	border-radius: 0.9375rem;
+	background-color: #6956D6;
+	transition: all 0s;
+	z-index: 1;
+	width: 0;
+	height: 100%;
+	top: 0;
+	left: 0;
+	will-change: width;
 }
 .vue-slide-bar-tooltip-container {
-  position: absolute;
-  transition: all 0s;
-  will-change: transform;
-  cursor: pointer;
-  z-index: 3;
-  left: 0;
-  top: -16px;
+	position: absolute;
+	transition: all 0s;
+	will-change: transform;
+	cursor: pointer;
+	z-index: 3;
+	left: 0.125rem;
+	top: -0.3125rem;
 }
 .vue-slide-bar-tooltip-wrap {
-  /* display: none; */
-  position: absolute;
-  z-index: 9;
-  width: 100%;
-  height: 100%;
-  display: block !important;
+	position: absolute;
+	z-index: 9;
+	width: 100%;
+	height: 100%;
+	display: block !important;
 }
 .vue-slide-bar-tooltip-top {
-  top: -12px;
-  left: 40%;
-  transform: translate(-50%, -100%);
+	top: -0.75rem;
+	left: 0.3125rem;
+	transform: translate(-50%, 0);
+  img{
+    width: 2.125rem;
+  }
 }
 .vue-slide-bar-tooltip {
-  position: relative;
-  font-size: 14px;
-  white-space: nowrap;
-  padding: 2px 5px;
-  min-width: 20px;
-  text-align: center;
-  color: #fff;
-  border-radius: 5px;
-  border: 1px solid #1066FD;
-  background-color: #1066FD;
-}
-.vue-slide-bar-tooltip::before {
-  content: '';
-  position: absolute;
-  bottom: -10px;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border: 5px solid transparent;
-  border-top-color: inherit;
-  transform: translate(-50%, 0);
+	position: relative;
+	font-size: 0.875rem;
+	white-space: nowrap;
+	padding: 0.125rem 0.3125rem;
+	min-width: 1.25rem;
+	text-align: center;
+	color: #fff;
+	border-radius: 0.3125rem;
+	// border: 0.0625rem solid #1066FD;
+	// background-color: #1066FD;
+	&::before {
+		content: '';
+		position: absolute;
+		bottom: -0.625rem;
+		left: 50%;
+		width: 0;
+		height: 0;
+		border: 0.3125rem solid transparent;
+		border-top-color: inherit;
+		transform: translate(-50%, 0);
+	}
 }
 .vue-slide-bar-range {
-  display: flex;
-  padding: 5px 0;
+	display: flex;
   justify-content: space-between;
+  margin-top: -0.3875rem;
+  z-index: 5;
 }
 .vue-slide-bar-separate {
-  position: relative;
-  width: 2px;
-  background-color: #9e9e9e;
-  height: 5px;
-  cursor: pointer;
+	position: relative;
+	width: 0.1875rem;
+  background: #ADB8CC;
+	height: 1.1875rem;
+	cursor: pointer;
+  border-radius: 0.9375rem;
+  transition: ease .2s;
+
+    &.progress{
+      background: #6956D6;
+    }
+
+  &:nth-child(even){
+    height: 0.875rem;
+  }
+
+  &:first-child{
+    padding-left: 0.125rem;
+  }
+  &:last-child{
+    padding-right: 0.125rem;
+  }
+
+
 }
 .vue-slide-bar-separate-text {
-  text-align: center;
-  position: absolute;
-  white-space: nowrap;
-  transform: translate(-50%, 0);
-  top: 6px;
+	text-align: center;
+	position: absolute;
+	white-space: nowrap;
+	transform: translate(-30%, 0);
+	top: 1.25rem;
+  font-size: 0.8125rem;
+  color: #6956D6;
+  font-weight: 600;
+
 }
 </style>
