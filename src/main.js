@@ -7,7 +7,7 @@ import axios from 'axios'
 Vue.config.productionTip = false
 Vue.use({
   ApexCharts,
-  axios
+  axios,
 })
 
 new Vue({

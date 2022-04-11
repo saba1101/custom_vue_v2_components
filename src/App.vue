@@ -21,7 +21,7 @@
         :placeholder="'Select Item List'"
         :darkTheme="false"
         :withCheckBox="true"
-        :multiSelect="false"
+        :multiSelect="true"
         :selecteditem="null"
       />
       <div class="wrap testfield">
@@ -57,7 +57,14 @@
         v-model="sliderValue"
       />
     </div>
-      <div id="chart" v-show="false"> </div>
+      <!-- <div id="chart" v-show="false"> </div> -->
+      <radar-chart
+        :width='400'
+        :height="400"
+        :chartdata="chartData"
+        :chartoptions="chartOptions"
+
+       />
 
       <div class="main-item-wrapper drag">
         <draggable 
@@ -77,7 +84,7 @@
       </div>
       <div class="main-item-wrapper">
               <star-rating
-                v-model="ratingValue"
+                @update:rating="(val) => ratingValue = val"
                 :starSize="30"
                 :round-start-rating="false"
                 :star-points="[23,2, 14,17, 0,19, 10,34, 7,50, 23,43, 38,50, 36,34, 46,19, 31,17]"
@@ -110,7 +117,15 @@
               >
             </slide-bar>
       </div>
+      <div class="main-item-wrapper">
+          <ul>
+              <li :class="['score']" v-for="i in scores" :key="i">
+                  {{i}}
+              </li>
+            </ul>
+      </div>
   </div>
+
 </template>
 
 <script>
@@ -124,6 +139,7 @@ import ApexCharts from 'apexcharts'
 import axios from 'axios'
 import StarRating from '@/components/StarRating/star-rating.vue'
 import SlideBar from '@/components/SlideBar/SlideBar.vue'
+import RadarChart from '@/components/RadarChart/RadarChart.vue'
 export default {
   name: 'App',
   components: {
@@ -134,10 +150,12 @@ export default {
     draggable,
     StarRating,
     SlideBar,
+    RadarChart,
     // RangeSlider
   },
   data(){
     return{
+      scores:[4,5,6,7],
       rate: null,
       listItem: null,
       ratingValue: 5.5,
@@ -146,42 +164,42 @@ export default {
       selectedTags:[],
       data: [],
       sliderValue: 7,
-      chartData:{
-        chart: {
-          type: 'radar',
-          dropShadow:{
-            enabled:true,
-            blur: 1,
-            left: 1,
-            top: 1,
-          },
-          zoom:{
-            enabled:true
-          }
-        },
-        series: [
-          {
-            name: 'series I',
-            data: [4,3,50,49,60,70,91,125,3]
-          },
-          {
-            name: 'series II',
-            data: [5,40,45,50,49,60,70,91,125]
-          },
-          {
-            name: 'series III',
-            data: [-133,40,45,50,49,60,70,91,125]
-          },
-          {
-            name: 'series IV',
-            data: [4,3,50,49,60,70,91,125,3]
-          },
+      // chartData:{
+      //   chart: {
+      //     type: 'radar',
+      //     dropShadow:{
+      //       enabled:true,
+      //       blur: 1,
+      //       left: 1,
+      //       top: 1,
+      //     },
+      //     zoom:{
+      //       enabled:true
+      //     }
+      //   },
+      //   series: [
+      //     {
+      //       name: 'series I',
+      //       data: [4,3,50,49,60,70,91,125,3]
+      //     },
+      //     {
+      //       name: 'series II',
+      //       data: [5,40,45,50,49,60,70,91,125]
+      //     },
+      //     {
+      //       name: 'series III',
+      //       data: [-133,40,45,50,49,60,70,91,125]
+      //     },
+      //     {
+      //       name: 'series IV',
+      //       data: [4,3,50,49,60,70,91,125,3]
+      //     },
 
-        ],
-        xaxis: {
-          categories: [1990,1992,1993,1994,1995,1996,1997, 1998,1999]
-        }
-      },
+      //   ],
+      //   xaxis: {
+      //     categories: [1990,1992,1993,1994,1995,1996,1997, 1998,1999]
+      //   }
+      // },
       arr:[
       {
         "id": 103,
@@ -267,7 +285,7 @@ export default {
         "titleTranslated": "Multitasking",
         "selected": false
       }
-    ],
+      ],
       testList: [],
       slider: {
         value: 5,
@@ -307,6 +325,48 @@ export default {
         processStyle: {
 
         }
+      },
+      chartData: {
+        labels: [
+          'Eating',
+          'Drinking',
+          'Sleeping',
+          'Designing',
+          'Coding',
+          'Cycling',
+          'Running',
+          'Running',
+          'Running',
+          'Running',
+          'Running',
+
+        ],
+        datasets: [
+          {
+            label: 'My First dataset',
+            backgroundColor: 'lime',
+            borderColor: 'lime',
+            pointBackgroundColor: 'rgba(179,181,198,1)',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgba(179,181,198,1)',
+            data: [0, 1, 2, 3, 4, 5, 6,7,8,9,10]
+          },
+          {
+            label: 'My Second dataset',
+            backgroundColor: 'rgba(255,99,132,0.2)',
+            borderColor: 'rgba(255,99,132,1)',
+            pointBackgroundColor: 'rgba(255,99,132,1)',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgba(255,99,132,1)',
+            data: [28, 48, 40, 19, 96, 27, 100]
+          }
+        ]
+      },
+      chartOptions: {
+        responsive: true,
+        maintainAspectRatio: false
       }
     }
   },
@@ -315,7 +375,7 @@ export default {
     this.getTestApi()
   },
   mounted(){
-    this.renderChartData(this.chartData)
+    // this.renderChartData(this.chartData)
   },
   methods:{
     slidebarDrag(){
@@ -495,6 +555,23 @@ export default {
   width: 500px !important;
 
 }
+ul{
+  list-style: none;
+}
+.score{
+  color: #3d3d3d;
+
+  &.red{
+    color: indianred;
+  }
+  &.lime{
+    color: lime;
+  }
+  &.orange{
+    color: orange;
+  }
+}
+
 .render{
   width: 6.25rem;
   height: 3.125rem;
