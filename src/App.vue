@@ -1,6 +1,26 @@
 <template>
   <div id="app">
     <div class="main-item-wrapper">
+      <div class="particles">
+          <vue-particles
+            color="#dedede"
+            :particleOpacity="0.7"
+            :particlesNumber="130"
+            shapeType="circle"
+            :particleSize="4"
+            linesColor="#dedede"
+            :linesWidth="1"
+            :lineLinked="false"
+            :lineOpacity="0"
+            :linesDistance="150"
+            :moveSpeed="2"
+            :hoverEffect="false"
+            hoverMode="grab"
+            :clickEffect="false"
+            clickMode="push"
+          >
+        </vue-particles>
+      </div>
       <rating
         :rateState="4"
         :disabled="false"
@@ -549,6 +569,16 @@ export default {
   grid-column-gap: 0.9375rem;
   grid-row-gap: 0.9375rem;
 
+}
+
+.particles{
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 0.0625rem solid red;
+  z-index: 9999;
+  width: 100vw;
+  height: 200vh;
 }
 
 .slider{

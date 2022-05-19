@@ -2,7 +2,8 @@ import Vue from 'vue'
 import App from './App.vue'
 import ApexCharts from 'apexcharts'
 import axios from 'axios'
-
+import VueParticles from 'vue-particles'
+Vue.use(VueParticles)
 
 Vue.config.productionTip = false
 Vue.use({
